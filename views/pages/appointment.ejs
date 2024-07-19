@@ -18,9 +18,22 @@
                                 <input type="date" id="date" name="date" class="form-control" required>
                             </div>
                             <div class="col-md-6 mt-3">
-                                <label for="slots" class="form-label">Appointment Slots (comma-separated, e.g.,
-                                    9:00,9:30,10:00)</label>
-                                <input type="text" id="slots" name="slots" class="form-control" required>
+                                <label for="slots" class="form-label">Appointment Slots</label>
+                                <div id="slot-buttons" class="d-flex flex-wrap">
+                                    <!-- Predefined time slots as buttons -->
+                                    <button type="button" class="btn btn-light m-1 slot-button"
+                                        data-time="9:00">9:00</button>
+                                    <button type="button" class="btn btn-light m-1 slot-button"
+                                        data-time="9:30">9:30</button>
+                                    <button type="button" class="btn btn-light m-1 slot-button"
+                                        data-time="10:00">10:00</button>
+                                    <button type="button" class="btn btn-light m-1 slot-button"
+                                        data-time="10:30">10:30</button>
+                                    <button type="button" class="btn btn-light m-1 slot-button"
+                                        data-time="11:00">11:00</button>
+                                    <!-- Add more buttons as needed -->
+                                </div>
+                                <input type="hidden" id="slots" name="slots" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-secondary mt-4">Add Slots</button>
@@ -29,13 +42,34 @@
     </section>
 
     <script>
-        document.getElementById('appointmentForm').addEventListener('submit', function (event) {
-            const slotsInput = document.getElementById('slots').value;
-            const slotsArray = slotsInput.split(',').map(slot => slot.trim());
+        document.addEventListener('DOMContentLoaded', function () {
+            const slotButtons = document.querySelectorAll('.slot-button');
+            const slotsInput = document.getElementById('slots');
 
-            // Add any additional validation if needed
+            slotButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const time = this.getAttribute('data-time');
+                    let slotsArray = slotsInput.value ? slotsInput.value.split(',') : [];
 
-            // Submit the form
-            event.target.submit();
+                    if (!slotsArray.includes(time)) {
+                        slotsArray.push(time);
+                        slotsInput.value = slotsArray.join(',');
+                        this.classList.remove('btn-light');
+                        this.classList.add('btn-primary');
+                    } else {
+                        slotsArray = slotsArray.filter(slot => slot !== time);
+                        slotsInput.value = slotsArray.join(',');
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-light');
+                    }
+                });
+            });
+
+            document.getElementById('appointmentForm').addEventListener('submit', function (event) {
+                if (!slotsInput.value) {
+                    event.preventDefault();
+                    alert('Please select at least one time slot.');
+                }
+            });
         });
     </script>
