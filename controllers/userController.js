@@ -16,7 +16,6 @@ exports.dashboard = (req, res) => {
     }
 };
 
-
 // This will render the Appointment page.
 exports.appointmentPage = (req, res) => {
     //We need to store the username to MATCH to the database & userType for authentication access to g and g2 page
@@ -30,8 +29,6 @@ exports.appointmentPage = (req, res) => {
         res.render('dashboard', { title: 'Dashboard Page', username, userType, loggedIn: false });
     }
 };
-
-
 
 //display user info based on user LICENSE NUMBER
 //First it will validate license Number
@@ -59,10 +56,6 @@ exports.gPage = (req, res) => {
             res.status(500).send('Internal Server Error');
         });
 };
-
-
-
-
 
 //If updating car details - we will match use user based on LICENSE NUMBER and then update it if MATCHED.
 //G page will be rendered after sucessfully updating user information.
