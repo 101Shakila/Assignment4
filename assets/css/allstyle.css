@@ -1,0 +1,59 @@
+html,
+body {
+    height: 100%;
+    transition: 0.5s;
+}
+
+body {
+    width: 100%;
+    background-color: rgb(59, 75, 82);
+    color: white;
+}
+
+.navbar ul {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    list-style: none;
+}
+
+.navbar-brand {
+    color: white;
+    text-decoration: none;
+    font-family: American Typewriter, serif;
+    transition: 0.3s;
+}
+
+#homelink {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+#content-title {
+    font-size: 60px;
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.border {
+    margin: 10px;
+}
+
+.gcontainer {
+    width: 80%;
+    transition: 1s;
+}
+
+.gcontainer:hover {
+    background-color: rgb(79, 118, 138);
+    transition: 0.5s;
+}
+
+.card-body {
+    background-color: rgb(131, 154, 166);
+}

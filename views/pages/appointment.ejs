@@ -1,0 +1,41 @@
+<%- include('../layout', { title: title }) %>
+
+    <section class="center-content">
+        <h1>Appointment Page</h1>
+
+        <% if (message) { %>
+            <h2 style="color: rgb(123, 220, 58)">
+                <%= message %>
+            </h2>
+            <% } %>
+
+                <div class="border border-4 p-4">
+                    <form id="appointmentForm" action="/appointment" method="POST">
+                        <div class="mb-4">
+                            <h2 id="content-title">Add Appointment Slots</h2>
+                            <div class="col-md-6">
+                                <label for="date" class="form-label">Date</label>
+                                <input type="date" id="date" name="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <label for="slots" class="form-label">Appointment Slots (comma-separated, e.g.,
+                                    9:00,9:30,10:00)</label>
+                                <input type="text" id="slots" name="slots" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary mt-4">Add Slots</button>
+                    </form>
+                </div>
+    </section>
+
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function (event) {
+            const slotsInput = document.getElementById('slots').value;
+            const slotsArray = slotsInput.split(',').map(slot => slot.trim());
+
+            // Add any additional validation if needed
+
+            // Submit the form
+            event.target.submit();
+        });
+    </script>
