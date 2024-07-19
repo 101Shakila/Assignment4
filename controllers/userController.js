@@ -1,4 +1,4 @@
-const { User, Appointment } = require('../models/User');//Import User Model - can interact with user collection made in mongoDB
+const User = require('../models/User');//Import User Model - can interact with user collection made in mongoDB
 const bcrypt = require('bcrypt');//Import bcrypt Library into our app - Helps hash passwords
 //Here we will update car info & user details
 
