@@ -116,4 +116,4 @@ userCollection.pre('save', async function (callback) { //async makes the functio
 //This will create a model names 'User' while using the schema defined above 'userCollection'
 const User = mongoose.model('User', userCollection);
 const Appointment = mongoose.model('Appointment', appointmentSchema);
-module.exports = { User, Appointment };
+module.exports = User;
