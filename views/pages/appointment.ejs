@@ -45,9 +45,36 @@
         document.addEventListener('DOMContentLoaded', function () {
             const slotButtons = document.querySelectorAll('.slot-button');
             const slotsInput = document.getElementById('slots');
+            const dateInput = document.getElementById('date');
+
+            // Function to check and disable existing slots
+            async function checkExistingSlots(date) {
+                const response = await fetch(`/check-slots?date=${date}`);
+                const existingSlots = await response.json();
+
+                slotButtons.forEach(button => {
+                    const time = button.getAttribute('data-time');
+                    if (existingSlots.includes(time)) {
+                        button.disabled = true;
+                        button.classList.remove('btn-light');
+                        button.classList.add('btn-secondary');
+                    } else {
+                        button.disabled = false;
+                        button.classList.remove('btn-secondary');
+                        button.classList.add('btn-light');
+                    }
+                });
+            }
+
+            dateInput.addEventListener('change', function () {
+                slotsInput.value = '';
+                checkExistingSlots(this.value);
+            });
 
             slotButtons.forEach(button => {
                 button.addEventListener('click', function () {
+                    if (this.disabled) return;
+
                     const time = this.getAttribute('data-time');
                     let slotsArray = slotsInput.value ? slotsInput.value.split(',') : [];
 

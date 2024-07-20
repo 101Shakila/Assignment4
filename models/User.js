@@ -9,12 +9,12 @@ const carInformationSchema = new Schema({
     make: {
         type: String,
         required: true,
-        default: 'Default'
+        default: 'First Name'
     },
     model: {
         type: String,
         required: true,
-        default: 'Default'
+        default: 'Last Name'
     },
     carYear: {
         type: Number,
@@ -24,7 +24,7 @@ const carInformationSchema = new Schema({
     plateNumber: {
         type: String, //Converted into string for flexibility.
         required: true,
-        default: 'Default'
+        default: 'Unknown'
     }
 
 });
@@ -107,5 +107,4 @@ userCollection.pre('save', async function (callback) { //async makes the functio
 
 //This will create a model names 'User' while using the schema defined above 'userCollection'
 const User = mongoose.model('User', userCollection);
-const Appointment = mongoose.model('Appointment', appointmentSchema);
 module.exports = User;

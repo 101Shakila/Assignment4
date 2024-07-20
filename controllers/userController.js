@@ -45,7 +45,7 @@ exports.gPage = (req, res) => {
     User.findOne({ username })
         .then(user => {
             if (user) {
-                const isNewUser = user.firstName !== 'Default' && user.lastName !== 'Default' && user.licenseNumber !== 'Default';
+                const isNewUser = user.firstName == 'First Name' && user.lastName == 'Last Name';
                 res.render('g', { title: 'G Page', user, message: null, isNewUser, userType, loggedIn: true });
             } else {
                 res.render('g', { title: 'G Page', message: 'User not found', user: null, userType, isNewUser: false, loggedIn: true });
