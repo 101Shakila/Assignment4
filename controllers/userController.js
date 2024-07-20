@@ -1,4 +1,5 @@
 const User = require('../models/User');//Import User Model - can interact with user collection made in mongoDB
+const Appointment = require('../models/Appointment');//Import User Model - can interact with user collection made in mongoDB
 const bcrypt = require('bcrypt');//Import bcrypt Library into our app - Helps hash passwords
 //Here we will update car info & user details
 
@@ -16,19 +17,7 @@ exports.dashboard = (req, res) => {
     }
 };
 
-// This will render the Appointment page.
-exports.appointmentPage = (req, res) => {
-    //We need to store the username to MATCH to the database & userType for authentication access to g and g2 page
-    const username = req.session.user.username;
-    const userType = req.session.user.userType;
 
-    if (username) {
-        res.render('appointment', { title: 'Appointment Page', username, userType, message: null, loggedIn: true });
-    }
-    else {
-        res.render('dashboard', { title: 'Dashboard Page', username, userType, loggedIn: false });
-    }
-};
 
 //display user info based on user LICENSE NUMBER
 //First it will validate license Number
@@ -159,4 +148,80 @@ exports.g2Post = async (req, res) => {
         res.status(500).send('Internal Server Error!!');
     }
 };
+
+// This will render the Appointment page.
+exports.appointmentPage = (req, res) => {
+    //We need to store the username to MATCH to the database & userType for authentication access to g and g2 page
+    const username = req.session.user.username;
+    const userType = req.session.user.userType;
+
+    if (username) {
+        res.render('appointment', { title: 'Appointment Page', username, userType, message: null, loggedIn: true });
+    }
+    else {
+        res.render('dashboard', { title: 'Dashboard Page', username, userType, loggedIn: false });
+    }
+};
+
+//Form submissions to post the appointment availability - done by the admin
+//Save new user deatils and renders g2 page
+exports.appointmentPost = async (req, res) => {
+    const { date, slots } = req.body;
+
+    if (!date || !slots) {
+        return res.status(400).send('Date and slots are required');
+    }
+
+    const slotsArray = slots.split(',');
+
+    try {
+        console.log(slotsArray);
+
+        for (const time of slotsArray) {
+            const existingAppointment = await Appointment.findOne({ date, time });
+            if (existingAppointment) {
+                return res.status(400).send(`Slot ${time} on ${date} is already taken`);
+            }
+
+            const appointment = new Appointment({ date, time });
+            await appointment.save();
+        }
+
+        res.redirect('/appointment');
+    } catch (error) {
+        res.status(500).send('An error occurred');
+    }
+};
+
+
+//Form submissions to post the appointment availability - done by the admin
+//Save new user deatils and renders g2 page
+exports.appointmentGet = async (req, res) => {
+    const { date, slots } = req.body;
+
+    if (!date || !slots) {
+        return res.status(400).send('Date and slots are required');
+    }
+
+    const slotsArray = slots.split(',');
+
+    try {
+        console.log(slotsArray);
+
+        for (const time of slotsArray) {
+            const existingAppointment = await Appointment.findOne({ date, time });
+            if (existingAppointment) {
+                return res.status(400).send(`Slot ${time} on ${date} is already taken`);
+            }
+
+            const appointment = new Appointment({ date, time });
+            await appointment.save();
+        }
+
+        res.redirect('/appointment');
+    } catch (error) {
+        res.status(500).send('An error occurred');
+    }
+};
+
 
