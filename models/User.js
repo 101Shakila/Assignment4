@@ -69,7 +69,11 @@ const userCollection = new Schema({
         required: true
     },
     //to nest the other cars section we have to do as below :       
-    carDetails: carInformationSchema
+    carDetails: carInformationSchema,
+    appointment: {
+        type: Schema.Types.ObjectId,
+        ref: 'Appointment'
+    }
 
 });
 

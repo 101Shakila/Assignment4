@@ -65,40 +65,11 @@
                         <button type="submit" class="btn btn-secondary">UPDATE</button>
                     </form>
                 </div>
-    </section>
 
-    <script>
-        function validateForm() {
-            //First we will capture all the data the customer has inputted
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const licenseNumber = document.getElementById('licenseNumber').value;
-            const age = document.getElementById('age').value;
-            const dob = document.getElementById('dob').value;
-            const make = document.getElementById('make').value;
-            const model = document.getElementById('model').value;
-            const carYear = document.getElementById('carYear').value;
-            const plateNumber = document.getElementById('plateNumber').value;
-
-            //This will be used to check if the value is alphabetic and not Numerical
-            const alphabeticalPattern = /^[A-Za-z\s]+$/;
-
-            //First we will check any of the fields are empty or not - as thats the minimal requirement
-            if (!firstName || !lastName || !licenseNumber || !age || !dob || !make || !model || !carYear || !plateNumber) {
-                alert('All fields are required.');
-                return false;
-            }
-            //using the earlier variable - we will test the below to see if they are alphabetical
-            if (!alphabeticalPattern.test(firstName) || !alphabeticalPattern.test(lastName) || !alphabeticalPattern.test(make) || !alphabeticalPattern.test(model)) {
-                alert('First Name, Last Name, Make, and Model must contain only letters and spaces.');
-                return false;
-            }
-            //Just putting 1886 since its considered thats the year the first automobile was created.
-            if (parseInt(carYear) < 1886) {
-                alert('Car Year must be 1886 or later.');
-                return false;
-            }
-
-            return true;
-        }
-    </script>
+                <div class="border border-4 p-4 mt-4">
+                    <h2 id="content-title">Book an Appointment</h2>
+                    <div class="col-md-6">
+                        <label for="appointmentDate" class="form-label">Select Date</label>
+                        <input type="date" id="appointmentDate" name="appointmentDate" class="form-control">
+                    </div>
+                    <div

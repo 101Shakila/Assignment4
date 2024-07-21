@@ -131,23 +131,25 @@ exports.g2Post = async (req, res) => {
                     'carDetails.make': req.body.make || 'Make',
                     'carDetails.model': req.body.model || 'Model',
                     'carDetails.carYear': req.body.carYear || new Date().getFullYear(),
-                    'carDetails.plateNumber': req.body.plateNumber || 'Plate Number'
+                    'carDetails.plateNumber': req.body.plateNumber || 'Plate Number',
+                    appointmentDate: req.body.appointmentDate,
+                    appointmentTime: req.body.appointmentTime
                 }
             },
-            { new: true, useFindAndModify: false } // Return the updated document
+            { new: true, useFindAndModify: false }
         );
 
         if (!updatedUser) {
-            return res.status(404).send('User is not found');
+            return res.status(404).send('User not found');
         }
 
-        res.render('g2', { title: 'G2 Page', user: updatedUser, message: 'Updated User Details!!', userType, loggedIn: true });
-
+        res.render('g2', { title: 'G2 Page', user: updatedUser, message: 'Updated User Details!', userType, loggedIn: true });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Internal Server Error!!');
+        res.status(500).send('Internal Server Error');
     }
 };
+
 
 // This will render the Appointment page.
 exports.appointmentPage = (req, res) => {
