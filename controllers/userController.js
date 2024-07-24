@@ -168,6 +168,7 @@ exports.appointmentPage = (req, res) => {
 
 //Form submissions to post the appointment availability - DONE by the admin
 exports.appointmentPost = async (req, res) => {
+    const userType = req.session.user.userType;
     const { date, slots } = req.body;
 
     if (!date || !slots) {
@@ -183,18 +184,16 @@ exports.appointmentPost = async (req, res) => {
             const existingAppointment = await Appointment.findOne({ date, time });
             console.log(existingAppointment);
             if (existingAppointment) {
-                //CHANGE THIS TO RENDER AND SEND MESSAGE!!!!!!!
-                return res.status(400).send(`Slot ${time} on ${date} is already taken`);
-                res.render('appointment', { title: 'G2 Page', user: updatedUser, message: 'Slot is already taken!', userType, loggedIn: true });
-
+                return res.render('appointment', { title: 'Appointment', message: `Slot ${time} is already taken!`, loggedIn: true, userType });
             }
 
             const appointment = new Appointment({ date, time });
             await appointment.save();
         }
 
-        res.redirect('/appointment');
+        return res.render('appointment', { title: 'Appointment', message: `Slot ${slotsArray} has been saved!`, loggedIn: true, userType });
     } catch (error) {
+        console.error(error);
         res.status(500).send('An error occurred');
     }
 };
