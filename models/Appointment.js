@@ -12,6 +12,10 @@ const appointmentSchema = new Schema({
     time: {
         type: String, // Storing time as a string
         required: true
+    },
+    isTimeAvailable: {
+        type: Boolean,
+        default: true
     }
 });
 

@@ -87,7 +87,8 @@ exports.updateCarInfo = (req, res) => {
         });
 };
 
-
+// userController.js
+// userController.js
 exports.g2Page = async (req, res) => {
     const username = req.session.user.username;
     const userType = req.session.user.userType;
@@ -98,8 +99,10 @@ exports.g2Page = async (req, res) => {
         let slots = [];
 
         if (selectedDate) {
-            const appointments = await Appointment.find({ date: selectedDate });
+            const appointments = await Appointment.find({ date: selectedDate, isTimeAvailable: true });
             slots = appointments.map(appointment => appointment.time);
+
+
         }
 
         if (user) {
@@ -114,20 +117,24 @@ exports.g2Page = async (req, res) => {
 };
 
 
+
+
 //Form submissions chekced and done here.
 //Create a new user based on values provided OR the values provided
 //Save new user deatils and renders g2 page
+// userController.js
 exports.g2Post = async (req, res) => {
     const username = req.session.user.username;
     const userType = req.session.user.userType;
     const defaultDob = new Date('2000-01-01');
     const saltRounds = 10;
-    const selectedDate = req.query.appointmentDate;
-    let slots = []
+    const selectedDate = req.body.appointmentDate;
+    const selectedTime = req.body.appointmentTime;
 
     try {
+        // Find and update user information
         const updatedUser = await User.findOneAndUpdate(
-            { username: username },
+            { username },
             {
                 $set: {
                     firstName: req.body.firstName || 'First Name',
@@ -139,8 +146,7 @@ exports.g2Post = async (req, res) => {
                     'carDetails.model': req.body.model || 'Model',
                     'carDetails.carYear': req.body.carYear || new Date().getFullYear(),
                     'carDetails.plateNumber': req.body.plateNumber || 'Plate Number',
-                    appointmentDate: req.body.appointmentDate,
-                    appointmentTime: req.body.appointmentTime
+                    appointment: req.body.appointmentId || null
                 }
             },
             { new: true, useFindAndModify: false }
@@ -150,12 +156,45 @@ exports.g2Post = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.render('g2', { title: 'G2 Page', user: updatedUser, message: 'Updated User Details!', userType, loggedIn: true, selectedDate, slots });
+        if (req.body.appointmentId) {
+            const updatedAppointment = await Appointment.findOneAndUpdate(
+                { date: selectedDate, time: selectedTime },
+                { $set: { isTimeAvailable: false } },
+                { new: true }
+            );
+
+            if (!updatedAppointment) {
+                return res.render('g2', {
+                    title: 'G2 Page',
+                    user: updatedUser,
+                    message: 'Updated successfully! Please choose an appointment date.',
+                    userType,
+                    loggedIn: true,
+                    selectedDate,
+                    slots: [],
+                    showAlert: true
+                });
+            }
+        }
+
+        res.render('g2', {
+            title: 'G2 Page',
+            user: updatedUser,
+            message: 'User updated successfully!',
+            userType,
+            loggedIn: true,
+            selectedDate,
+            slots: [],
+            showAlert: false
+        });
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
     }
 };
+
+
 
 
 // This will render the Appointment page.
@@ -173,6 +212,7 @@ exports.appointmentPage = (req, res) => {
 };
 
 //Form submissions to post the appointment availability - DONE by the admin
+// userController.js
 exports.appointmentPost = async (req, res) => {
     const userType = req.session.user.userType;
     const { date, slots } = req.body;
@@ -184,11 +224,9 @@ exports.appointmentPost = async (req, res) => {
     const slotsArray = slots.split(',');
 
     try {
-        console.log(slotsArray);
-
         for (const time of slotsArray) {
             const existingAppointment = await Appointment.findOne({ date, time });
-            console.log(existingAppointment);
+
             if (existingAppointment) {
                 return res.render('appointment', { title: 'Appointment', message: `Slot ${time} is already taken!`, loggedIn: true, userType });
             }
@@ -206,17 +244,28 @@ exports.appointmentPost = async (req, res) => {
 
 
 
+
+
 // Add this function to handle booking an appointment
 exports.bookAppointment = async (req, res) => {
     const username = req.session.user.username;
     const selectedSlot = req.body.selectedSlot;
 
     if (!selectedSlot) {
-        return res.render('g2', { title: 'G2 Page', message: 'No slot selected', user: req.session.user, userType: req.session.user.userType, loggedIn: true });
+        return res.render('g2', {
+            title: 'G2 Page',
+            message: 'No slot selected',
+            user: req.session.user,
+            userType: req.session.user.userType,
+            loggedIn: true,
+            slots: [],
+            selectedDate: req.query.appointmentDate,
+            showAlert: true // Pass a flag to show alert
+        });
     }
 
     try {
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }).populate('carDetails'); // Populate carDetails if necessary
 
         if (!user) {
             return res.status(404).send('User not found');
@@ -233,11 +282,42 @@ exports.bookAppointment = async (req, res) => {
         user.appointment = appointment._id;
         await user.save();
 
-        res.render('g2', { title: 'G2 Page', user, message: 'Appointment booked successfully!', userType: req.session.user.userType, loggedIn: true, slots: [], selectedDate: req.query.appointmentDate });
+        // Update the appointment to set the slot as not available
+        const updatedAppointment = await Appointment.findOneAndUpdate(
+            { date: appointment.date, time: appointment.time },
+            { $set: { isTimeAvailable: false } },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedAppointment) {
+            return res.render('g2', {
+                title: 'G2 Page',
+                user,
+                message: 'Updated successfully! Now Please choose an appointment date',
+                userType: req.session.user.userType,
+                loggedIn: true,
+                selectedDate: req.query.appointmentDate,
+                slots: [], // Clear slots or populate as needed
+                showAlert: true // Flag for showing alert
+            });
+        }
+
+        res.render('g2', {
+            title: 'G2 Page',
+            user,
+            message: 'Appointment booked successfully!',
+            userType: req.session.user.userType,
+            loggedIn: true,
+            selectedDate: req.query.appointmentDate,
+            slots: [], // Clear slots or populate as needed
+            showAlert: false // No alert needed
+        });
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
