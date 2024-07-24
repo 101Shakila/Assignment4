@@ -7,7 +7,6 @@
                 <h2>Welcome, new user! Please complete your profile.</h2>
                 <a href="/g2" class="btn btn-primary">Go to G2 Page</a>
                 <% } else { %>
-
                     <div class="mb-4">
                         <div class="col-md-6">
                             <% if (message) { %>
@@ -15,61 +14,82 @@
                                     <%= message %>
                                 </h2>
                                 <% } %>
-                                    <!-- This is where the condition is set for if the user updated their default data or not in g2 page -->
+
+                                    <!-- User Information -->
                                     <% if (user) { %>
-                                        <h2>User Information</h2>
-                                        <p><strong>First Name:</strong>
-                                            <%= user.firstName %>
-                                        </p>
-                                        <p><strong>Last Name:</strong>
-                                            <%= user.lastName %>
-                                        </p>
-                                        <p><strong>License Number:</strong>
-                                            <%= user.licenseNumber %>
-                                        </p>
-                                        <p><strong>Age:</strong>
-                                            <%= user.age %>
-                                        </p>
-                                        <p><strong>DOB:</strong>
-                                            <%= user.dob.toDateString() %>
-                                        </p>
-                                        <h2>Car Information</h2>
-                                        <form id="checkUpdate" action="/g" method="POST"
-                                            onsubmit="return updateCheck()">
-                                            <input type="hidden" name="licenseNumber" value="<%= user.licenseNumber %>">
-                                            <div class="mb-3">
-                                                <label for="make" class="form-label">Make</label>
-                                                <input type="text" class="form-control" id="make" name="make"
-                                                    value="<%= user.carDetails.make %>">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="model" class="form-label">Model</label>
-                                                <input type="text" class="form-control" id="model" name="model"
-                                                    value="<%= user.carDetails.model %>">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="carYear" class="form-label">Car Year</label>
-                                                <input type="number" class="form-control" id="carYear" name="carYear"
-                                                    value="<%= user.carDetails.carYear %>">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="plateNumber" class="form-label">Plate Number</label>
-                                                <input type="text" class="form-control" id="plateNumber"
-                                                    name="plateNumber" value="<%= user.carDetails.plateNumber %>">
-                                            </div>
-                                            <button type="submit" class="btn btn-secondary">UPDATE</button>
-                                        </form>
+                                        <div class="mb-4">
+                                            <h2>User Information</h2>
+                                            <p><strong>First Name:</strong>
+                                                <%= user.firstName %>
+                                            </p>
+                                            <p><strong>Last Name:</strong>
+                                                <%= user.lastName %>
+                                            </p>
+                                            <p><strong>License Number:</strong>
+                                                <%= user.licenseNumber %>
+                                            </p>
+                                            <p><strong>Age:</strong>
+                                                <%= user.age %>
+                                            </p>
+                                            <p><strong>DOB:</strong>
+                                                <%= user.dob.toDateString() %>
+                                            </p>
+                                        </div>
+
+                                        <!-- Car Information -->
+                                        <div class="mb-4">
+                                            <h2>Car Information</h2>
+                                            <form id="checkUpdate" action="/g" method="POST"
+                                                onsubmit="return updateCheck()">
+                                                <input type="hidden" name="licenseNumber"
+                                                    value="<%= user.licenseNumber %>">
+                                                <div class="mb-3">
+                                                    <label for="make" class="form-label">Make</label>
+                                                    <input type="text" class="form-control" id="make" name="make"
+                                                        value="<%= user.carDetails.make %>">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="model" class="form-label">Model</label>
+                                                    <input type="text" class="form-control" id="model" name="model"
+                                                        value="<%= user.carDetails.model %>">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="carYear" class="form-label">Car Year</label>
+                                                    <input type="number" class="form-control" id="carYear"
+                                                        name="carYear" value="<%= user.carDetails.carYear %>">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="plateNumber" class="form-label">Plate Number</label>
+                                                    <input type="text" class="form-control" id="plateNumber"
+                                                        name="plateNumber" value="<%= user.carDetails.plateNumber %>">
+                                                </div>
+                                                <button type="submit" class="btn btn-secondary">UPDATE</button>
+                                            </form>
+                                        </div>
+
+                                        <!-- Appointment Details -->
+                                        <div class="mb-4">
+                                            <h2>Appointment Details</h2>
+                                            <% if (user.appointment) { %>
+                                                <p><strong>Date:</strong>
+                                                    <%= user.appointment.date %>
+                                                </p>
+                                                <p><strong>Time:</strong>
+                                                    <%= user.appointment.time %>
+                                                </p>
+                                                <% } else { %>
+                                                    <p>No appointment booked.</p>
+                                                    <% } %>
+                                        </div>
                                         <% } %>
                         </div>
                     </div>
+                    <% } %>
         </div>
-        <% } %>
-
     </section>
 
-
     <script>
-        //The below function checks if the car details are matching the correct syntax for each variable!
+        // Function to check if the car details are valid
         function updateCheck() {
             const make = document.getElementById("make").value;
             const model = document.getElementById("model").value;

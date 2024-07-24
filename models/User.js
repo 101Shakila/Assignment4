@@ -78,18 +78,6 @@ const userCollection = new Schema({
 
 });
 
-//For admin we gotta create appointment schema
-const appointmentSchema = new Schema({
-    date: {
-        type: String, // Storing date as a string for simplicity
-        required: true
-    },
-    time: {
-        type: String, // Storing time as a string
-        required: true
-    }
-});
-
 //To improve security - we will ENCRYPT the license number before saving it into the system.
 //middleware refers to functions that run during the lifecycle of a request to a server, but before the final request handler.
 //Below will be treated as a pre-save middlewear for userCollection 

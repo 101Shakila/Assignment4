@@ -32,12 +32,14 @@ exports.gPage = (req, res) => {
     }
 
     User.findOne({ username })
+        .populate('appointment') // Populate the appointment field
+
         .then(user => {
             if (user) {
                 const isNewUser = user.firstName == 'First Name' && user.lastName == 'Last Name';
-                res.render('g', { title: 'G Page', user, message: null, isNewUser, userType, loggedIn: true });
+                res.render('g', { title: 'G Page', user, message: null, isNewUser, userType, loggedIn: true, appointment: user.appointment || {} });
             } else {
-                res.render('g', { title: 'G Page', message: 'User not found', user: null, userType, isNewUser: false, loggedIn: true });
+                res.render('g', { title: 'G Page', message: 'User not found', user: null, userType, isNewUser: false, loggedIn: true, appointment: {} });
             }
         })
         .catch(err => {
