@@ -87,26 +87,30 @@ exports.updateCarInfo = (req, res) => {
         });
 };
 
-//rendering G2 PAGE
-exports.g2Page = (req, res) => {
 
-    //We need to store the username to MATCH to the database & userType for authentication access to g and g2 page
+exports.g2Page = async (req, res) => {
     const username = req.session.user.username;
     const userType = req.session.user.userType;
+    const selectedDate = req.query.appointmentDate;
 
+    try {
+        const user = await User.findOne({ username });
+        let slots = [];
 
-    User.findOne({ username })
-        .then(user => {
-            if (user) {
-                res.render('g2', { title: 'G2 Page', user, message: null, userType, loggedIn: true });
-            } else {
-                res.render('g2', { title: 'G2 Page', message: 'User is not found', user: null, userType, loggedIn: true });
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send('Internal Server Error!!!');
-        });
+        if (selectedDate) {
+            const appointments = await Appointment.find({ date: selectedDate });
+            slots = appointments.map(appointment => appointment.time);
+        }
+
+        if (user) {
+            res.render('g2', { title: 'G2 Page', user, message: null, userType, loggedIn: true, slots, selectedDate });
+        } else {
+            res.render('g2', { title: 'G2 Page', message: 'User not found', user: null, userType, loggedIn: true, slots, selectedDate });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Internal Server Error');
+    }
 };
 
 
@@ -118,6 +122,8 @@ exports.g2Post = async (req, res) => {
     const userType = req.session.user.userType;
     const defaultDob = new Date('2000-01-01');
     const saltRounds = 10;
+    const selectedDate = req.query.appointmentDate;
+    let slots = []
 
     try {
         const updatedUser = await User.findOneAndUpdate(
@@ -144,7 +150,7 @@ exports.g2Post = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.render('g2', { title: 'G2 Page', user: updatedUser, message: 'Updated User Details!', userType, loggedIn: true });
+        res.render('g2', { title: 'G2 Page', user: updatedUser, message: 'Updated User Details!', userType, loggedIn: true, selectedDate, slots });
     } catch (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
@@ -199,22 +205,39 @@ exports.appointmentPost = async (req, res) => {
 };
 
 
-//Form submissions to post the appointment availability - done by the admin
-// Check existing slots for a given date
-exports.checkSlots = async (req, res) => {
-    const { date } = req.query;
 
-    if (!date) {
-        return res.status(400).send('Date is required');
+// Add this function to handle booking an appointment
+exports.bookAppointment = async (req, res) => {
+    const username = req.session.user.username;
+    const selectedSlot = req.body.selectedSlot;
+
+    if (!selectedSlot) {
+        return res.render('g2', { title: 'G2 Page', message: 'No slot selected', user: req.session.user, userType: req.session.user.userType, loggedIn: true });
     }
 
     try {
-        const appointments = await Appointment.find({ date });
-        const existingSlots = appointments.map(appointment => appointment.time);
+        const user = await User.findOne({ username });
 
-        res.json(existingSlots);
-    } catch (error) {
-        res.status(500).send('An error occurred');
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Find the selected appointment slot
+        const appointment = await Appointment.findOne({ time: selectedSlot });
+
+        if (!appointment) {
+            return res.status(404).send('Appointment slot not found');
+        }
+
+        // Update the user's appointment
+        user.appointment = appointment._id;
+        await user.save();
+
+        res.render('g2', { title: 'G2 Page', user, message: 'Appointment booked successfully!', userType: req.session.user.userType, loggedIn: true, slots: [], selectedDate: req.query.appointmentDate });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
     }
 };
+
 
