@@ -10,7 +10,7 @@ router.post('/g', authMiddleware, userController.updateCarInfo);
 router.get('/g2', authMiddleware, userController.g2Page);
 router.post('/g2', authMiddleware, userController.g2Post);
 router.post('/appointment', authMiddleware, userController.appointmentPost);
-router.get('/checkAppointment', authMiddleware, userController.appointmentGet);
+router.get('/slots-aval', authMiddleware, userController.checkSlots);
 
 
 

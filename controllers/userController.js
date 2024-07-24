@@ -94,6 +94,7 @@ exports.g2Page = (req, res) => {
     const username = req.session.user.username;
     const userType = req.session.user.userType;
 
+
     User.findOne({ username })
         .then(user => {
             if (user) {
@@ -165,8 +166,7 @@ exports.appointmentPage = (req, res) => {
     }
 };
 
-//Form submissions to post the appointment availability - done by the admin
-//Save new user deatils and renders g2 page
+//Form submissions to post the appointment availability - DONE by the admin
 exports.appointmentPost = async (req, res) => {
     const { date, slots } = req.body;
 
@@ -181,8 +181,12 @@ exports.appointmentPost = async (req, res) => {
 
         for (const time of slotsArray) {
             const existingAppointment = await Appointment.findOne({ date, time });
+            console.log(existingAppointment);
             if (existingAppointment) {
+                //CHANGE THIS TO RENDER AND SEND MESSAGE!!!!!!!
                 return res.status(400).send(`Slot ${time} on ${date} is already taken`);
+                res.render('appointment', { title: 'G2 Page', user: updatedUser, message: 'Slot is already taken!', userType, loggedIn: true });
+
             }
 
             const appointment = new Appointment({ date, time });
@@ -197,33 +201,21 @@ exports.appointmentPost = async (req, res) => {
 
 
 //Form submissions to post the appointment availability - done by the admin
-//Save new user deatils and renders g2 page
-exports.appointmentGet = async (req, res) => {
-    const { date, slots } = req.body;
+// Check existing slots for a given date
+exports.checkSlots = async (req, res) => {
+    const { date } = req.query;
 
-    if (!date || !slots) {
-        return res.status(400).send('Date and slots are required');
+    if (!date) {
+        return res.status(400).send('Date is required');
     }
 
-    const slotsArray = slots.split(',');
-
     try {
-        console.log(slotsArray);
+        const appointments = await Appointment.find({ date });
+        const existingSlots = appointments.map(appointment => appointment.time);
 
-        for (const time of slotsArray) {
-            const existingAppointment = await Appointment.findOne({ date, time });
-            if (existingAppointment) {
-                return res.status(400).send(`Slot ${time} on ${date} is already taken`);
-            }
-
-            const appointment = new Appointment({ date, time });
-            await appointment.save();
-        }
-
-        res.redirect('/appointment');
+        res.json(existingSlots);
     } catch (error) {
         res.status(500).send('An error occurred');
     }
 };
-
 

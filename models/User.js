@@ -70,6 +70,7 @@ const userCollection = new Schema({
     },
     //to nest the other cars section we have to do as below :       
     carDetails: carInformationSchema,
+    //adding field is added here because we need to store the appointment ID based on the user
     appointment: {
         type: Schema.Types.ObjectId,
         ref: 'Appointment'

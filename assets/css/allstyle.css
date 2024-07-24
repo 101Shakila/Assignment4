@@ -57,3 +57,27 @@ body {
 .card-body {
     background-color: rgb(131, 154, 166);
 }
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-fill {
+    flex: 1;
+}
+
+.m-2 {
+    margin: 0.5rem;
+}
+
+.col-md-12 {
+    margin-bottom: 1rem;
+}
