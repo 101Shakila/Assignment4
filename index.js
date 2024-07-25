@@ -14,6 +14,13 @@
 //Rushang Panchal - Setup the conditions on the pages for the data being transfered
 //Shakila Samaradiwakara - Setup the MCV pattern & encryption - Which includes the controllers, middlewear, routes and models.
 
+
+//Assignment 4
+//Alphin Tom - Verified the routing for the appointment details and checked if data is being sent properly. Made sure correct variables were sent in routing.
+//Rushang Panchal - Created the functionality for admin - appointment
+//Shakila Samaradiwakara - Cross checked functionality for admin appointment, fetching appointment data and g2 and g page functionalities.
+
+
 //How to Run notes below!!!
 
 //The below is all done through terminal
