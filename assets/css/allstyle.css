@@ -1,6 +1,12 @@
 html,
 body {
     height: 100%;
+    margin: 0;
+    /* Add margin reset */
+    padding: 0;
+    /* Add padding reset */
+    overflow-x: hidden;
+    /* Ensure no horizontal scroll */
     transition: 0.5s;
 }
 
@@ -10,11 +16,18 @@ body {
     color: white;
 }
 
+.navbar {
+    width: 100%;
+    /* Ensure navbar takes full width */
+}
+
 .navbar ul {
     display: flex;
     justify-content: space-around;
     flex-direction: row;
     list-style: none;
+    padding-left: 0;
+    /* Ensure no padding */
 }
 
 .navbar-brand {
@@ -38,10 +51,24 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 0 auto
+        /* Center content horizontally */
+}
+
+.dashboard-class {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    /* Center content horizontally */
 }
 
 .border {
     margin: 10px;
+    border-color: #007bff !important;
 }
 
 .gcontainer {
@@ -82,15 +109,6 @@ body {
     margin-bottom: 1rem;
 }
 
-.center-content {
-    max-width: 1200px;
-    padding: 20px;
-}
-
-.border {
-    border-color: #007bff !important;
-}
-
 .bg-light {
     background-color: #f8f9fa !important;
 }
@@ -122,4 +140,14 @@ body {
 
 .list-group-item:nth-child(odd) {
     background-color: #f8f9fa;
+}
+
+/* Additional style to ensure no overflow */
+.container-fluid {
+    max-width: 100%;
+    /* Ensure no overflow */
+    padding-left: 0;
+    /* Ensure no padding */
+    padding-right: 0;
+    /* Ensure no padding */
 }

@@ -63,10 +63,11 @@ exports.updateCarInfo = (req, res) => {
     const { make, model, carYear, plateNumber } = req.body;
 
     if (!make.match(/^[A-Za-z\s]{1,50}$/) || !model.match(/^[A-Za-z\s]{1,50}$/) || !carYear.match(/^\d{4}$/) || !plateNumber.match(/^[a-zA-Z0-9]+$/)) {
-        return res.render('g', { title: 'G Page', message: 'Invalid input', goToG2: false, userType, user: null, loggedIn: true });
+        return res.render('g', { title: 'G Page', message: 'Invalid input', goToG2: false, userType, user: null, loggedIn: true, isNewUser: true });
     }
 
     User.findOne({ username })
+        .populate('appointment') // Populate the appointment field
         .then(user => {
             if (user) {
                 user.carDetails.make = make;
@@ -80,7 +81,7 @@ exports.updateCarInfo = (req, res) => {
         })
         .then(savedUser => {
             if (savedUser) {
-                res.render('g', { title: 'G Page', user: savedUser, message: 'Updated successfully', goToG2: false, userType, loggedIn: true });
+                res.render('g', { title: 'G Page', user: savedUser, message: 'Updated successfully', goToG2: false, userType, loggedIn: true, isNewUser: false, appointment: savedUser.appointment || {} });
             }
         })
         .catch(err => {
@@ -134,29 +135,29 @@ exports.g2Post = async (req, res) => {
     const selectedTime = req.body.appointmentTime;
 
     try {
-        // Find and update user information
-        const updatedUser = await User.findOneAndUpdate(
-            { username },
-            {
-                $set: {
-                    firstName: req.body.firstName || 'First Name',
-                    lastName: req.body.lastName || 'Last Name',
-                    licenseNumber: req.body.licenseNumber ? await bcrypt.hash(req.body.licenseNumber, saltRounds) : 'Unknown',
-                    age: req.body.age || 18,
-                    dob: req.body.dob || defaultDob,
-                    'carDetails.make': req.body.make || 'Make',
-                    'carDetails.model': req.body.model || 'Model',
-                    'carDetails.carYear': req.body.carYear || new Date().getFullYear(),
-                    'carDetails.plateNumber': req.body.plateNumber || 'Plate Number',
-                    appointment: req.body.appointmentId || null
-                }
-            },
-            { new: true, useFindAndModify: false }
-        );
+        // Find the user
+        const user = await User.findOne({ username });
 
-        if (!updatedUser) {
+        if (!user) {
             return res.status(404).send('User not found');
         }
+
+        // Update user details
+        user.firstName = req.body.firstName || 'First Name';
+        user.lastName = req.body.lastName || 'Last Name';
+        user.licenseNumber = req.body.licenseNumber ? await bcrypt.hash(req.body.licenseNumber, saltRounds) : 'Unknown';
+        user.age = req.body.age || 18;
+        user.dob = req.body.dob || defaultDob;
+        user.carDetails.make = req.body.make || 'Make';
+        user.carDetails.model = req.body.model || 'Model';
+        user.carDetails.carYear = req.body.carYear || new Date().getFullYear();
+        user.carDetails.plateNumber = req.body.plateNumber || 'Plate Number';
+
+        if (req.body.appointmentId) {
+            user.appointment = req.body.appointmentId;
+        }
+
+        const updatedUser = await user.save();
 
         if (req.body.appointmentId) {
             const updatedAppointment = await Appointment.findOneAndUpdate(
@@ -195,6 +196,7 @@ exports.g2Post = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 
@@ -267,24 +269,34 @@ exports.bookAppointment = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({ username }).populate('carDetails'); // Populate carDetails if necessary
+        const user = await User.findOne({ username }).populate('appointment');
 
         if (!user) {
             return res.status(404).send('User not found');
         }
 
-        // Find the selected appointment slot
+        if (user.appointment) {
+            return res.render('g2', {
+                title: 'G2 Page',
+                message: 'You already have an appointment booked. You cannot book another one.',
+                user,
+                userType: req.session.user.userType,
+                loggedIn: true,
+                selectedDate: req.query.appointmentDate,
+                slots: [], // Clear slots or populate as needed
+                showAlert: true // Flag for showing alert
+            });
+        }
+
         const appointment = await Appointment.findOne({ time: selectedSlot });
 
         if (!appointment) {
             return res.status(404).send('Appointment slot not found');
         }
 
-        // Update the user's appointment
         user.appointment = appointment._id;
         await user.save();
 
-        // Update the appointment to set the slot as not available
         const updatedAppointment = await Appointment.findOneAndUpdate(
             { date: appointment.date, time: appointment.time },
             { $set: { isTimeAvailable: false } },
@@ -312,11 +324,10 @@ exports.bookAppointment = async (req, res) => {
             loggedIn: true,
             selectedDate: req.query.appointmentDate,
             slots: [], // Clear slots or populate as needed
-            showAlert: false // No alert needed
+            showAlert: true // Flag for showing alert
         });
-
     } catch (err) {
-        console.error(err);
+        console.log(err);
         res.status(500).send('Internal Server Error');
     }
 };

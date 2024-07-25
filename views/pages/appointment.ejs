@@ -1,23 +1,23 @@
 <%- include('../layout', { title: title }) %>
 
     <section class="center-content">
-        <h1>Appointment Page</h1>
+        <h1 class="text-center mb-4">Appointment Page</h1>
 
         <% if (message) { %>
-            <h2 style="color: rgb(123, 220, 58)">
+            <h2 class="text-center text-success">
                 <%= message %>
             </h2>
             <% } %>
 
-                <div class="border border-4 p-4">
+                <div class="border border-4 p-4 bg-light text-dark">
                     <form id="appointmentForm" action="/appointment" method="POST">
                         <div class="mb-4">
-                            <h2 id="content-title">Add Appointment Slots</h2>
-                            <div class="col-md-6">
+                            <h2 class="text-center mb-4">Add Appointment Slots</h2>
+                            <div class="mb-3">
                                 <label for="date" class="form-label">Date</label>
                                 <input type="date" id="date" name="date" class="form-control" required>
                             </div>
-                            <div class="col-md-6 mt-3">
+                            <div class="mb-3">
                                 <label for="slots" class="form-label">Appointment Slots</label>
                                 <div id="slot-buttons" class="d-flex flex-wrap">
                                     <!-- Predefined time slots as buttons -->
@@ -36,7 +36,7 @@
                                 <input type="hidden" id="slots" name="slots" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-secondary mt-4">Add Slots</button>
+                        <button type="submit" class="btn btn-secondary btn-lg w-100">Add Slots</button>
                     </form>
                 </div>
     </section>
