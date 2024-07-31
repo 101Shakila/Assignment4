@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;  // This is reference to Schema Class ~ can crea
 const bcrypt = require('bcrypt'); //Import bcrypt Library into our app - Helps hash passwords
 
 
-//based on g2 test page - we will save the information the user input
+//based on g2. test page - we will save the information the user input
 const carInformationSchema = new Schema({
     make: {
         type: String,
